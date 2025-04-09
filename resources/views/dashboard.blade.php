@@ -1,264 +1,431 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<x-layouts.app>
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
+            
+            <!-- Stats overview with larger icons -->
+            <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <!-- Total Websites -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-indigo-100 dark:bg-indigo-900 mr-4">
-                            <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition duration-300 hover:shadow-lg hover:scale-[1.02] transform">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $totalWebsites ?? 0 }}
+                                </div>
+                                <div class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Total Websites
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Websites</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">12</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="{{ route('websites.index') }}" class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 flex items-center">
+                                View all
+                                <svg class="ml-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Websites Up -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 mr-4">
-                            <svg class="h-8 w-8 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                <!-- Active Websites -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition duration-300 hover:shadow-lg hover:scale-[1.02] transform">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $upWebsites ?? 0 }}
+                                </div>
+                                <div class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Up Websites <span class="text-xs">(of {{ $activeWebsites ?? 0 }} active)</span>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Websites Up</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">10</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="{{ route('websites.index') }}?status=up" class="font-medium text-green-600 dark:text-green-400 hover:text-green-500 flex items-center">
+                                View active
+                                <svg class="ml-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Websites Down -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-red-100 dark:bg-red-900 mr-4">
-                            <svg class="h-8 w-8 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
+                <!-- Changed Websites -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition duration-300 hover:shadow-lg hover:scale-[1.02] transform">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $changedWebsites ?? 0 }}
+                                </div>
+                                <div class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Changed Websites
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Websites Down</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">2</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="{{ route('websites.index') }}?status=changed" class="font-medium text-amber-600 dark:text-amber-400 hover:text-amber-500 flex items-center">
+                                View changes
+                                <svg class="ml-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Changes -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="flex items-center">
-                        <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900 mr-4">
-                            <svg class="h-8 w-8 text-purple-600 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                            </svg>
+                <!-- Down Websites -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg transition duration-300 hover:shadow-lg hover:scale-[1.02] transform">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl p-4">
+                                <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $downWebsites ?? 0 }}
+                                </div>
+                                <div class="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Down Websites
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Recent Changes</p>
-                            <p class="text-3xl font-bold text-gray-900 dark:text-white">8</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 px-5 py-3">
+                        <div class="text-sm">
+                            <a href="{{ route('websites.index') }}?status=down" class="font-medium text-red-600 dark:text-red-400 hover:text-red-500 flex items-center">
+                                View issues
+                                <svg class="ml-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Monitored Websites -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Monitored Websites</h2>
-                        <a href="#" class="px-4 py-2 bg-gradient-to-r from-[#7B42F6] to-[#4A6FFB] text-white rounded-md text-sm font-semibold hover:from-[#6935D9] hover:to-[#4162DE]">
-                            Add New Website
-                        </a>
+            <!-- Monitoring Charts -->
+            <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- Status Breakdown Chart -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Status Breakdown</h3>
+                        <div class="mt-4 h-64 flex items-center justify-center">
+                            <div class="w-full h-full" id="status-chart"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-900/50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Website</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Response Time</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Check</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">example.com</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">https://example.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                            Up
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        120ms
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        15 minutes ago
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">View</a>
-                                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">Edit</a>
-                                            <a href="#" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">test-site.com</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">https://test-site.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                            Down
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        -
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        5 minutes ago
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">View</a>
-                                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">Edit</a>
-                                            <a href="#" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
-                                                <svg class="h-6 w-6 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                                                </svg>
-                                            </div>
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">demo-app.com</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">https://demo-app.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
-                                            Changed
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        95ms
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        10 minutes ago
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <a href="#" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">View</a>
-                                            <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200">Edit</a>
-                                            <a href="#" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                <!-- Response Time Chart -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Average Response Times</h3>
+                        <div class="mt-4 h-64 flex items-center justify-center">
+                            <div class="w-full h-full" id="response-time-chart"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Recent Activity</h2>
+            <!-- Websites with issues -->
+            @if(isset($websitesWithIssues) && $websitesWithIssues->count() > 0)
+            <div class="mt-8">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="h-6 w-6 text-red-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Websites with Issues
+                </h2>
+                <div class="mt-4 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flow-root">
+                            <ul role="list" class="-my-5 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($websitesWithIssues as $website)
+                                <li class="py-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out px-2">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-10 w-10 rounded-full flex items-center justify-center {{ $website->last_status === 'down' ? 'bg-red-100 dark:bg-red-900' : 'bg-yellow-100 dark:bg-yellow-900' }}">
+                                                @if($website->last_status === 'down')
+                                                    <svg class="h-6 w-6 text-red-600 dark:text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                @else
+                                                    <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                {{ $website->name }}
+                                            </p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                                {{ $website->url }}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $website->last_status === 'down' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' }}">
+                                                {{ ucfirst($website->last_status) }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $website->last_checked_at ? $website->last_checked_at->diffForHumans() : 'Never' }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="{{ route('websites.show', $website) }}" class="inline-flex items-center shadow-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <ul class="space-y-4">
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <span class="flex h-8 w-8 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center">
-                                    <svg class="h-5 w-5 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    test-site.com is down
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    5 minutes ago
-                                </p>
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <span class="flex h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900 items-center justify-center">
-                                    <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    Visual changes detected on demo-app.com
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    10 minutes ago
-                                </p>
-                            </div>
-                        </li>
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0">
-                                <span class="flex h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 items-center justify-center">
-                                    <svg class="h-5 w-5 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    New website added: example.com
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    15 minutes ago
-                                </p>
-                            </div>
-                        </li>
-                    </ul>
+            </div>
+            @endif
+
+            <!-- Recent activity -->
+            <div class="mt-8">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="h-6 w-6 text-indigo-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Recent Activity
+                </h2>
+                <div class="mt-4 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flow-root">
+                            <ul role="list" class="-my-5 divide-y divide-gray-200 dark:divide-gray-700">
+                                @forelse($recentLogs ?? [] as $log)
+                                <li class="py-4 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md transition duration-150 ease-in-out px-2">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex-shrink-0">
+                                            <span class="flex items-center justify-center h-10 w-10 rounded-full {{ $log->status === 'up' ? 'bg-green-100 dark:bg-green-900' : ($log->status === 'down' ? 'bg-red-100 dark:bg-red-900' : 'bg-yellow-100 dark:bg-yellow-900') }}">
+                                                @if($log->status === 'up')
+                                                <svg class="h-6 w-6 text-green-600 dark:text-green-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                @elseif($log->status === 'down')
+                                                <svg class="h-6 w-6 text-red-600 dark:text-red-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                @else
+                                                <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                @endif
+                                            </span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                {{ $log->website->name }}
+                                            </p>
+                                            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                                <span class="inline-block mr-3">
+                                                    {{ ucfirst($log->status) }}
+                                                </span>
+                                                @if($log->status_code)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+                                                        {{ $log->status_code }}
+                                                    </span>
+                                                @endif
+                                                @if($log->error_message)
+                                                    <span class="ml-2 truncate">{{ $log->error_message }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                                {{ $log->created_at->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <a href="{{ route('websites.show', $log->website) }}" class="inline-flex items-center shadow-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-full text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                @empty
+                                <li class="py-6 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <svg class="h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p class="mt-2 text-base text-gray-500 dark:text-gray-400">No monitoring activity yet</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Activity will appear here once your websites are monitored</p>
+                                    </div>
+                                </li>
+                                @endforelse
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <!-- ApexCharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect dark mode
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        
+        // Status breakdown donut chart
+        const statusOptions = {
+            series: JSON.parse('[{{ $upWebsites ?? 0 }}, {{ $changedWebsites ?? 0 }}, {{ $downWebsites ?? 0 }}]'),
+            labels: ['Up', 'Changed', 'Down'],
+            chart: {
+                type: 'donut',
+                height: '100%',
+                fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            },
+            colors: ['#10B981', '#F59E0B', '#EF4444'],
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center',
+                labels: {
+                    colors: isDarkMode ? '#D1D5DB' : '#374151',
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '50%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Websites',
+                                formatter: function(w) {
+                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    return total;
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            dataLabels: {
+                style: {
+                    fontSize: '14px',
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontWeight: 'medium',
+                    colors: [isDarkMode ? '#FFFFFF' : '#000000']
+                }
+            },
+            tooltip: {
+                theme: isDarkMode ? 'dark' : 'light',
+            },
+            responsive: [
+                {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 250
+                        }
+                    }
+                }
+            ],
+        };
+
+        // Sample data for response time chart (replace with real data from backend)
+        const responseTimes = {
+            dates: ['7 days ago', '6 days ago', '5 days ago', '4 days ago', '3 days ago', '2 days ago', 'Yesterday', 'Today'],
+            times: [320, 280, 300, 290, 305, 295, 285, 275]
+        };
+
+        const responseTimeOptions = {
+            series: [{
+                name: 'Avg. Response Time (ms)',
+                data: responseTimes.times
+            }],
+            chart: {
+                height: '100%',
+                type: 'line',
+                toolbar: {
+                    show: false
+                },
+                fontFamily: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            },
+            colors: ['#6366F1'],
+            stroke: {
+                curve: 'smooth',
+                width: 3
+            },
+            xaxis: {
+                categories: responseTimes.dates,
+                labels: {
+                    style: {
+                        colors: isDarkMode ? '#D1D5DB' : '#374151',
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: isDarkMode ? '#D1D5DB' : '#374151',
+                    }
+                }
+            },
+            markers: {
+                size: 4,
+                colors: ["#6366F1"],
+                strokeColors: "#fff",
+                strokeWidth: 2,
+                hover: {
+                    size: 7,
+                }
+            },
+            grid: {
+                borderColor: isDarkMode ? '#374151' : '#E5E7EB',
+            },
+            tooltip: {
+                theme: isDarkMode ? 'dark' : 'light',
+            }
+        };
+
+        if (document.getElementById('status-chart')) {
+            const statusChart = new ApexCharts(document.getElementById('status-chart'), statusOptions);
+            statusChart.render();
+        }
+
+        if (document.getElementById('response-time-chart')) {
+            const responseTimeChart = new ApexCharts(document.getElementById('response-time-chart'), responseTimeOptions);
+            responseTimeChart.render();
+        }
+    });
+    </script>
+</x-layouts.app>

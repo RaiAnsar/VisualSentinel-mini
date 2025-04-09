@@ -16,13 +16,13 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-base font-semibold">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('websites')" class="text-base font-semibold">
+                    <x-nav-link :href="route('websites.index')" :active="request()->routeIs('websites.*')" class="text-base font-semibold">
                         {{ __('Websites') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('screenshots')" class="text-base font-semibold">
-                        {{ __('Screenshots') }}
+                    <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" class="text-base font-semibold">
+                        {{ __('Tags') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('settings')" class="text-base font-semibold">
+                    <x-nav-link :href="route('settings.smtp')" :active="request()->routeIs('settings.*')" class="text-base font-semibold">
                         {{ __('Settings') }}
                     </x-nav-link>
                 </div>
@@ -33,15 +33,14 @@
                 <!-- Dark mode toggle -->
                 <button 
                     type="button" 
-                    class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none" 
-                    onclick="toggleDarkMode()"
+                    class="dark-mode-toggle p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none" 
                 >
-                    <!-- Sun icon -->
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <!-- Sun icon (shown in dark mode) -->
+                    <svg class="light-icon w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <!-- Moon icon -->
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <!-- Moon icon (shown in light mode) -->
+                    <svg class="dark-icon w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                     </svg>
                 </button>
@@ -96,13 +95,13 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('websites')">
+            <x-responsive-nav-link :href="route('websites.index')" :active="request()->routeIs('websites.*')">
                 {{ __('Websites') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('screenshots')">
-                {{ __('Screenshots') }}
+            <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')">
+                {{ __('Tags') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('settings')">
+            <x-responsive-nav-link :href="route('settings.smtp')" :active="request()->routeIs('settings.*')">
                 {{ __('Settings') }}
             </x-responsive-nav-link>
         </div>
@@ -119,16 +118,15 @@
                 <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
                     <button 
                         type="button" 
-                        class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-                        onclick="toggleDarkMode()"
+                        class="dark-mode-toggle inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                         <span class="mr-2">Toggle Dark Mode</span>
-                        <!-- Sun icon -->
-                        <svg class="w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Sun icon (shown in dark mode) -->
+                        <svg class="light-icon w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <!-- Moon icon -->
-                        <svg class="w-4 h-4 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Moon icon (shown in light mode) -->
+                        <svg class="dark-icon w-4 h-4 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
                     </button>
