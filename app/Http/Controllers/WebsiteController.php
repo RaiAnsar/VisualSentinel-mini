@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class WebsiteController extends Controller
 {
@@ -525,8 +526,16 @@ class WebsiteController extends Controller
             ]
         ];
         
-        // Merge with defaults
-        $mergedSettings = array_merge_recursive(
+        // Handle performance threshold before merge to prevent array issues
+        if (isset($notificationSettings['performance']['threshold'])) {
+            // If threshold is an array, take the first value
+            if (is_array($notificationSettings['performance']['threshold'])) {
+                $notificationSettings['performance']['threshold'] = $notificationSettings['performance']['threshold'][0];
+            }
+        }
+        
+        // Use array_merge instead of array_merge_recursive to avoid creating nested arrays
+        $mergedSettings = array_merge(
             $defaultSettings,
             $notificationSettings
         );
@@ -853,5 +862,294 @@ class WebsiteController extends Controller
                 $this->getTextNodes($element->childNodes->item($i), $textNodes);
             }
         }
+    }
+
+    /**
+     * Handle bulk actions for websites
+     */
+    public function bulkAction(Request $request)
+    {
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'action' => 'required|string|in:activate,pause,refresh,set_interval,add_tag,remove_tag,delete',
+            'website_ids' => 'required|array',
+            'website_ids.*' => 'exists:websites,id',
+            'interval' => 'nullable|integer|min:1|max:1440',
+            'tag_id' => 'nullable|exists:tags,id',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('websites.index')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $action = $request->input('action');
+        $websiteIds = $request->input('website_ids');
+        $userId = Auth::id();
+
+        // Only allow actions on websites owned by the user
+        $websites = Website::whereIn('id', $websiteIds)
+            ->where('user_id', $userId)
+            ->get();
+
+        if ($websites->isEmpty()) {
+            return redirect()->route('websites.index')
+                ->with('error', 'No valid websites selected.');
+        }
+
+        $count = $websites->count();
+        $successMessage = '';
+
+        switch ($action) {
+            case 'activate':
+                Website::whereIn('id', $websiteIds)
+                    ->where('user_id', $userId)
+                    ->update(['is_active' => true]);
+                $successMessage = "{$count} websites activated successfully.";
+                break;
+
+            case 'pause':
+                Website::whereIn('id', $websiteIds)
+                    ->where('user_id', $userId)
+                    ->update(['is_active' => false]);
+                $successMessage = "{$count} websites paused successfully.";
+                break;
+
+            case 'refresh':
+                foreach ($websites as $website) {
+                    // Create a dummy monitoring log for demo
+                    $log = new MonitoringLog();
+                    $log->website_id = $website->id;
+                    
+                    // Generate sample status for demo (80% chance of up)
+                    $rand = mt_rand(1, 100);
+                    $status = ($rand <= 80) ? 'up' : ($rand <= 95 ? 'down' : 'changed');
+                    $statusCode = ($status === 'up') ? 200 : ($status === 'down' ? 500 : 200);
+                    $responseTime = mt_rand(50, 1500);
+                    
+                    // Set log values
+                    $log->status_code = $statusCode;
+                    $log->status = $status;
+                    $log->response_time = $responseTime;
+                    $log->details = [
+                        'checked_at' => now()->toIso8601String(),
+                        'ip_used' => $website->use_ip_override ? $website->ip_override : '127.0.0.1',
+                        'headers' => [
+                            'User-Agent' => 'Visual Sentinel Monitoring/1.0',
+                            'Accept' => 'text/html,application/xhtml+xml,application/xml'
+                        ]
+                    ];
+                    
+                    // Save the log
+                    $log->save();
+                    
+                    // Update website with the latest status
+                    $website->last_checked_at = now();
+                    $website->last_status = $status;
+                    $website->last_status_code = $statusCode;
+                    $website->last_response_time = $responseTime;
+                    $website->save();
+                }
+                $successMessage = "{$count} websites checked successfully.";
+                break;
+
+            case 'set_interval':
+                $interval = $request->input('interval');
+                if (!$interval) {
+                    return redirect()->route('websites.index')
+                        ->with('error', 'No interval specified.');
+                }
+                
+                Website::whereIn('id', $websiteIds)
+                    ->where('user_id', $userId)
+                    ->update(['check_interval' => $interval]);
+                $successMessage = "Check interval updated to {$interval} minutes for {$count} websites.";
+                break;
+
+            case 'add_tag':
+                $tagId = $request->input('tag_id');
+                if (!$tagId) {
+                    return redirect()->route('websites.index')
+                        ->with('error', 'No tag specified.');
+                }
+                
+                // Verify tag belongs to user
+                $tag = Tag::where('id', $tagId)
+                    ->where('user_id', $userId)
+                    ->first();
+                
+                if (!$tag) {
+                    return redirect()->route('websites.index')
+                        ->with('error', 'Invalid tag selected.');
+                }
+                
+                // Add tag to each website
+                foreach ($websites as $website) {
+                    // Only add if not already tagged
+                    if (!$website->tags->contains($tagId)) {
+                        $website->tags()->attach($tagId);
+                    }
+                }
+                $successMessage = "Tag '{$tag->name}' added to {$count} websites.";
+                break;
+
+            case 'remove_tag':
+                $tagId = $request->input('tag_id');
+                if (!$tagId) {
+                    return redirect()->route('websites.index')
+                        ->with('error', 'No tag specified.');
+                }
+                
+                // Verify tag belongs to user
+                $tag = Tag::where('id', $tagId)
+                    ->where('user_id', $userId)
+                    ->first();
+                
+                if (!$tag) {
+                    return redirect()->route('websites.index')
+                        ->with('error', 'Invalid tag selected.');
+                }
+                
+                // Remove tag from each website
+                foreach ($websites as $website) {
+                    $website->tags()->detach($tagId);
+                }
+                $successMessage = "Tag '{$tag->name}' removed from {$count} websites.";
+                break;
+
+            case 'delete':
+                foreach ($websites as $website) {
+                    // Delete all related monitoring logs and screenshots
+                    $website->monitoringLogs()->delete();
+                    $website->screenshots()->delete();
+                    
+                    // Delete website
+                    $website->delete();
+                }
+                $successMessage = "{$count} websites deleted successfully.";
+                break;
+
+            default:
+                return redirect()->route('websites.index')
+                    ->with('error', 'Invalid action specified.');
+        }
+
+        return redirect()->route('websites.index')
+            ->with('success', $successMessage);
+    }
+
+    /**
+     * Export website monitoring data
+     */
+    public function export(Request $request, Website $website)
+    {
+        // Make sure the website belongs to the authenticated user
+        if ($website->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Get export parameters
+        $type = $request->input('type', 'logs');
+        $days = (int) $request->input('days', 30);
+        
+        // Get the date range
+        $startDate = now()->subDays($days);
+        $endDate = now();
+        
+        // Filename for the export
+        $filename = $website->name . '_' . $type . '_' . $days . 'days_' . now()->format('Ymd') . '.csv';
+        
+        // Set headers for CSV download
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+        
+        // Create CSV output stream
+        $callback = function() use ($website, $type, $startDate, $endDate) {
+            $file = fopen('php://output', 'w');
+            
+            if ($type === 'logs') {
+                // Export raw monitoring logs
+                fputcsv($file, [
+                    'Date/Time', 
+                    'Status', 
+                    'Response Time (ms)', 
+                    'HTTP Status', 
+                    'SSL Status', 
+                    'Content Status',
+                    'Visual Change (%)'
+                ]);
+                
+                // Get logs for the date range
+                $logs = $website->monitoringLogs()
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->orderBy('created_at')
+                    ->get();
+                
+                foreach ($logs as $log) {
+                    fputcsv($file, [
+                        $log->created_at,
+                        $log->status,
+                        $log->response_time,
+                        $log->http_status,
+                        $log->ssl_status,
+                        $log->content_status,
+                        $log->visual_change_pct
+                    ]);
+                }
+            } else {
+                // Export summary data
+                fputcsv($file, [
+                    'Date', 
+                    'Total Checks', 
+                    'Uptime (%)', 
+                    'Avg Response Time (ms)', 
+                    'SSL Issues',
+                    'Content Changes',
+                    'Visual Changes'
+                ]);
+                
+                // Group data by day
+                $dailyStats = $website->monitoringLogs()
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->select(
+                        DB::raw('DATE(created_at) as date'),
+                        DB::raw('COUNT(*) as total_checks'),
+                        DB::raw('ROUND(AVG(response_time)) as avg_response_time'),
+                        DB::raw('SUM(CASE WHEN status = "up" THEN 1 ELSE 0 END) as up_checks'),
+                        DB::raw('SUM(CASE WHEN ssl_status != "valid" THEN 1 ELSE 0 END) as ssl_issues'),
+                        DB::raw('SUM(CASE WHEN content_status = "changed" THEN 1 ELSE 0 END) as content_changes'),
+                        DB::raw('MAX(visual_change_pct) as max_visual_change')
+                    )
+                    ->groupBy(DB::raw('DATE(created_at)'))
+                    ->orderBy(DB::raw('DATE(created_at)'))
+                    ->get();
+                
+                foreach ($dailyStats as $stat) {
+                    $uptime = $stat->total_checks > 0 
+                        ? round(($stat->up_checks / $stat->total_checks) * 100, 2) 
+                        : 100;
+                    
+                    fputcsv($file, [
+                        $stat->date,
+                        $stat->total_checks,
+                        $uptime,
+                        $stat->avg_response_time,
+                        $stat->ssl_issues,
+                        $stat->content_changes,
+                        $stat->max_visual_change
+                    ]);
+                }
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
     }
 }

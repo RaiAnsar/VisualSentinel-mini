@@ -8,8 +8,8 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <script>
-            // Initialize dark mode based on localStorage
-            if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Initialize dark mode based on localStorage using 'theme'
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');

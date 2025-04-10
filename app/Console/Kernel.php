@@ -46,9 +46,13 @@ class Kernel extends ConsoleKernel
                     $statusCodes = [200, 200, 200, 201, 204, 301, 302, 304, 400, 401, 403, 404, 500, 503];
                     $statusCode = $statusCodes[array_rand($statusCodes)];
                     
-                    // 80% chance of site being up
-                    $rand = mt_rand(1, 100);
-                    $status = ($rand <= 80) ? 'up' : 'down';
+                    // Determine status based on status code
+                    if ($statusCode >= 200 && $statusCode < 400) {
+                        $status = 'up';
+                    } else {
+                        $status = 'down';
+                        // TODO: Add more specific statuses later (e.g., client_error, server_error)
+                    }
                     
                     // Response time between 50ms and 1500ms
                     $responseTime = mt_rand(50, 1500);

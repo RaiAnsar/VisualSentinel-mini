@@ -31,6 +31,7 @@ class Website extends Model
         'baseline_screenshot_id',
         'monitoring_options',
         'notification_settings',
+        'advanced_settings',
         'metadata',
         'ip_override',
         'use_ip_override',
@@ -48,6 +49,7 @@ class Website extends Model
         'last_baseline_at' => 'datetime',
         'monitoring_options' => 'json',
         'notification_settings' => 'json',
+        'advanced_settings' => 'json',
         'metadata' => 'json',
         'use_ip_override' => 'boolean',
     ];

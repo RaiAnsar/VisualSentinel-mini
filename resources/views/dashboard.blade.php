@@ -1,7 +1,62 @@
-<x-layouts.app>
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
+            
+            <!-- Onboarding Card for New Users -->
+            @if(($totalWebsites ?? 0) == 0)
+            <div class="mt-6 bg-gradient-to-r from-indigo-500 to-blue-600 dark:from-indigo-600 dark:to-blue-700 rounded-lg shadow-lg overflow-hidden">
+                <div class="px-6 py-8 md:flex md:items-center md:justify-between">
+                    <div class="md:flex-1">
+                        <h2 class="text-2xl font-bold text-white mb-2">Welcome to Visual Sentinel!</h2>
+                        <p class="text-indigo-100 mb-6">Get started by adding your first website to monitor. It only takes a minute to set up.</p>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20 text-white">1</div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-white">Add a Website</h3>
+                                    <p class="mt-1 text-indigo-100">Enter your website URL and configure basic monitoring settings.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20 text-white">2</div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-white">Set Up Notifications</h3>
+                                    <p class="mt-1 text-indigo-100">Configure email alerts for downtime, changes, and performance issues.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-white bg-opacity-20 text-white">3</div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-white">Review Monitoring Data</h3>
+                                    <p class="mt-1 text-indigo-100">Visual Sentinel will start monitoring your website immediately.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 md:mt-0 md:ml-6 flex justify-center">
+                        <a href="{{ route('websites.create') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                            <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add Your First Website
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endif
             
             <!-- Stats overview with larger icons -->
             <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -303,9 +358,16 @@
         // Detect dark mode
         const isDarkMode = document.documentElement.classList.contains('dark');
         
-        // Status breakdown donut chart
+        // Status breakdown donut chart data (from PHP)
+        const statusSeriesData = [{{ $upWebsites ?? 0 }}, {{ $changedWebsites ?? 0 }}, {{ $downWebsites ?? 0 }}];
+
+        // Response time chart data (from PHP)
+        const responseChartLabels = {!! json_encode($responseChartLabels ?? []) !!};
+        const responseChartData = {!! json_encode($responseChartData ?? []) !!};
+
+        // Status breakdown donut chart options
         const statusOptions = {
-            series: JSON.parse('[{{ $upWebsites ?? 0 }}, {{ $changedWebsites ?? 0 }}, {{ $downWebsites ?? 0 }}]'),
+            series: statusSeriesData, // Use JS variable
             labels: ['Up', 'Changed', 'Down'],
             chart: {
                 type: 'donut',
@@ -361,16 +423,11 @@
             ],
         };
 
-        // Sample data for response time chart (replace with real data from backend)
-        const responseTimes = {
-            dates: ['7 days ago', '6 days ago', '5 days ago', '4 days ago', '3 days ago', '2 days ago', 'Yesterday', 'Today'],
-            times: [320, 280, 300, 290, 305, 295, 285, 275]
-        };
-
+        // Response time chart options
         const responseTimeOptions = {
             series: [{
                 name: 'Avg. Response Time (ms)',
-                data: responseTimes.times
+                data: responseChartData // Use JS variable
             }],
             chart: {
                 height: '100%',
@@ -386,7 +443,7 @@
                 width: 3
             },
             xaxis: {
-                categories: responseTimes.dates,
+                categories: responseChartLabels, // Use JS variable
                 labels: {
                     style: {
                         colors: isDarkMode ? '#D1D5DB' : '#374151',
@@ -428,4 +485,4 @@
         }
     });
     </script>
-</x-layouts.app>
+</x-app-layout>

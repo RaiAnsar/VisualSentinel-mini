@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Models\Website;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -64,6 +65,16 @@ class SettingsController extends Controller
             // Get SMTP settings
             $smtpSettings = Setting::getSmtpSettings();
             
+            // Log SMTP settings for debugging (without password)
+            Log::info('SMTP Test Settings', [
+                'host' => $smtpSettings['smtp_host'] ?? env('MAIL_HOST'),
+                'port' => $smtpSettings['smtp_port'] ?? env('MAIL_PORT'),
+                'username' => $smtpSettings['smtp_username'] ?? env('MAIL_USERNAME'),
+                'encryption' => $smtpSettings['smtp_encryption'] ?? env('MAIL_ENCRYPTION'),
+                'from_address' => $smtpSettings['smtp_from_address'] ?? env('MAIL_FROM_ADDRESS'),
+                'from_name' => $smtpSettings['smtp_from_name'] ?? env('MAIL_FROM_NAME'),
+            ]);
+            
             // Configure mail with these settings
             config([
                 'mail.mailers.smtp.host' => $smtpSettings['smtp_host'] ?? env('MAIL_HOST'),
@@ -73,7 +84,14 @@ class SettingsController extends Controller
                 'mail.mailers.smtp.encryption' => $smtpSettings['smtp_encryption'] ?? env('MAIL_ENCRYPTION'),
                 'mail.from.address' => $smtpSettings['smtp_from_address'] ?? env('MAIL_FROM_ADDRESS'),
                 'mail.from.name' => $smtpSettings['smtp_from_name'] ?? env('MAIL_FROM_NAME'),
+                // Additional settings to help with TLS/SSL issues
+                'mail.mailers.smtp.allow_self_signed' => true,
+                'mail.mailers.smtp.verify_peer' => false,
+                'mail.mailers.smtp.verify_peer_name' => false,
             ]);
+            
+            // Force the mailer to be SMTP
+            config(['mail.default' => 'smtp']);
             
             // Send test email
             Mail::raw('This is a test email from Visual Sentinel.', function($message) use ($email) {
@@ -81,8 +99,13 @@ class SettingsController extends Controller
                     ->subject('Visual Sentinel - Test Email');
             });
             
-            return redirect()->back()->with('success', 'Test email sent successfully!');
+            return redirect()->back()->with('success', 'Test email sent successfully! Please check your inbox and spam folder.');
         } catch (\Exception $e) {
+            Log::error('SMTP Test Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return redirect()->back()->with('error', 'Failed to send test email: ' . $e->getMessage());
         }
     }

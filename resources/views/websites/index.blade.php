@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
@@ -150,6 +150,9 @@
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-8">
+                                        <input id="selectAllHeader" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:border-gray-600 dark:bg-gray-800">
+                                    </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Website</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Monitoring</th>
@@ -161,6 +164,9 @@
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse($websites as $website)
                                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" class="website-checkbox h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:border-gray-600 dark:bg-gray-800" data-id="{{ $website->id }}">
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 {{ $website->last_status === 'up' ? 'bg-green-100 dark:bg-green-900' : ($website->last_status === 'down' ? 'bg-red-100 dark:bg-red-900' : ($website->last_status === 'changed' ? 'bg-yellow-100 dark:bg-yellow-900' : 'bg-gray-100 dark:bg-gray-700')) }} rounded-md flex items-center justify-center">
@@ -326,87 +332,253 @@
     @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle bulk actions bar when checkboxes are checked
-            const checkboxes = document.querySelectorAll('input[type="checkbox"].website-checkbox');
-            const selectAllCheckbox = document.getElementById('selectAll');
+            // Filters handling
+            const statusSelect = document.getElementById('status');
+            const tagSelect = document.getElementById('tag');
+            const searchInput = document.getElementById('search');
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const resetFiltersBtn = document.getElementById('resetFilters');
+            
+            // Initialize filters from URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('status')) statusSelect.value = urlParams.get('status');
+            if (urlParams.has('tag')) tagSelect.value = urlParams.get('tag');
+            if (urlParams.has('search')) searchInput.value = urlParams.get('search');
+            
+            // Apply Filters
+            applyFiltersBtn.addEventListener('click', function() {
+                const params = new URLSearchParams();
+                if (statusSelect.value) params.append('status', statusSelect.value);
+                if (tagSelect.value) params.append('tag', tagSelect.value);
+                if (searchInput.value) params.append('search', searchInput.value);
+                
+                window.location.href = '{{ route("websites.index") }}?' + params.toString();
+            });
+            
+            // Reset Filters
+            resetFiltersBtn.addEventListener('click', function() {
+                window.location.href = '{{ route("websites.index") }}';
+            });
+            
+            // Batch operations handling
+            const websiteCheckboxes = document.querySelectorAll('.website-checkbox');
+            const selectAllHeader = document.getElementById('selectAllHeader');
+            const selectAll = document.getElementById('selectAll');
+            const selectedCountSpan = document.getElementById('selectedCount');
             const bulkActionsBar = document.getElementById('bulkActionsBar');
-            const selectedCountElement = document.getElementById('selectedCount');
+            const cancelSelectionBtn = document.getElementById('cancelSelection');
             const bulkActionsDropdownBtn = document.getElementById('bulkActionsDropdownBtn');
             const bulkActionsDropdown = document.getElementById('bulkActionsDropdown');
-            const cancelSelectionBtn = document.getElementById('cancelSelection');
             
-            // Function to update the bulk actions bar
+            // Show/hide bulk actions bar
             function updateBulkActionsBar() {
-                const checkedCount = document.querySelectorAll('input[type="checkbox"].website-checkbox:checked').length;
-                if (checkedCount > 0) {
+                const selectedCount = document.querySelectorAll('.website-checkbox:checked').length;
+                selectedCountSpan.textContent = selectedCount;
+                
+                if (selectedCount > 0) {
                     bulkActionsBar.classList.remove('hidden');
-                    selectedCountElement.textContent = checkedCount;
                 } else {
                     bulkActionsBar.classList.add('hidden');
                 }
             }
             
-            // Add event listeners to all checkboxes
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateBulkActionsBar);
+            // Select all checkboxes
+            function toggleSelectAll(source) {
+                websiteCheckboxes.forEach(checkbox => {
+                    checkbox.checked = source.checked;
+                });
+                updateBulkActionsBar();
+            }
+            
+            // Handle individual checkbox changes
+            websiteCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateBulkActionsBar();
+                    
+                    // Update header checkbox state
+                    const allChecked = document.querySelectorAll('.website-checkbox:checked').length === websiteCheckboxes.length;
+                    selectAllHeader.checked = allChecked;
+                    selectAll.checked = allChecked;
+                });
             });
             
-            // Select all functionality
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function() {
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = selectAllCheckbox.checked;
-                    });
-                    updateBulkActionsBar();
-                });
-            }
+            // Select all checkbox in header
+            selectAllHeader.addEventListener('change', function() {
+                toggleSelectAll(this);
+            });
+            
+            // Select all checkbox in bulk actions bar
+            selectAll.addEventListener('change', function() {
+                toggleSelectAll(this);
+                selectAllHeader.checked = this.checked;
+            });
             
             // Cancel selection
-            if (cancelSelectionBtn) {
-                cancelSelectionBtn.addEventListener('click', function() {
-                    selectAllCheckbox.checked = false;
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    bulkActionsBar.classList.add('hidden');
+            cancelSelectionBtn.addEventListener('click', function() {
+                websiteCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
                 });
-            }
+                selectAllHeader.checked = false;
+                selectAll.checked = false;
+                updateBulkActionsBar();
+            });
             
             // Toggle bulk actions dropdown
-            if (bulkActionsDropdownBtn && bulkActionsDropdown) {
-                bulkActionsDropdownBtn.addEventListener('click', function() {
-                    bulkActionsDropdown.classList.toggle('hidden');
+            bulkActionsDropdownBtn.addEventListener('click', function() {
+                bulkActionsDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!bulkActionsDropdownBtn.contains(event.target) && !bulkActionsDropdown.contains(event.target)) {
+                    bulkActionsDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Get selected website IDs
+            function getSelectedWebsiteIds() {
+                const selectedIds = [];
+                document.querySelectorAll('.website-checkbox:checked').forEach(checkbox => {
+                    selectedIds.push(checkbox.getAttribute('data-id'));
                 });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(event) {
-                    if (!bulkActionsDropdownBtn.contains(event.target) && !bulkActionsDropdown.contains(event.target)) {
-                        bulkActionsDropdown.classList.add('hidden');
-                    }
-                });
+                return selectedIds;
             }
             
-            // Implement dummy bulk actions (these would be connected to actual functionality in a real implementation)
-            document.getElementById('bulkActivate')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Bulk activate would be implemented here');
-                bulkActionsDropdown.classList.add('hidden');
-            });
-            
-            document.getElementById('bulkPause')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('Bulk pause would be implemented here');
-                bulkActionsDropdown.classList.add('hidden');
-            });
-            
-            document.getElementById('bulkDelete')?.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (confirm('Are you sure you want to delete the selected websites? This action cannot be undone.')) {
-                    alert('Bulk delete would be implemented here');
+            // Create and submit form for bulk actions
+            function submitBulkAction(action, additionalData = {}) {
+                const selectedIds = getSelectedWebsiteIds();
+                if (selectedIds.length === 0) return;
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("websites.bulk-action") }}';
+                form.style.display = 'none';
+                
+                // CSRF Token
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                form.appendChild(csrfToken);
+                
+                // Action
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = action;
+                form.appendChild(actionInput);
+                
+                // Website IDs
+                selectedIds.forEach(id => {
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'website_ids[]';
+                    idInput.value = id;
+                    form.appendChild(idInput);
+                });
+                
+                // Additional data
+                for (const [key, value] of Object.entries(additionalData)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
                 }
-                bulkActionsDropdown.classList.add('hidden');
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+            
+            // Bulk action handlers
+            document.getElementById('bulkActivate').addEventListener('click', function(e) {
+                e.preventDefault();
+                submitBulkAction('activate');
+            });
+            
+            document.getElementById('bulkPause').addEventListener('click', function(e) {
+                e.preventDefault();
+                submitBulkAction('pause');
+            });
+            
+            document.getElementById('refreshSelected').addEventListener('click', function() {
+                submitBulkAction('refresh');
+            });
+            
+            document.getElementById('bulkSetInterval').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const interval = prompt('Enter check interval in minutes (1-1440):', '30');
+                if (interval !== null && interval.trim() !== '') {
+                    const intervalValue = parseInt(interval.trim());
+                    if (!isNaN(intervalValue) && intervalValue >= 1 && intervalValue <= 1440) {
+                        submitBulkAction('set_interval', { interval: intervalValue });
+                    } else {
+                        alert('Please enter a valid interval between 1 and 1440 minutes.');
+                    }
+                }
+            });
+            
+            document.getElementById('bulkAddTag').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show modal or dropdown to select tags
+                const tagOptions = [];
+                @foreach($tags as $tag)
+                    tagOptions.push({ id: {{ $tag->id }}, name: '{{ $tag->name }}' });
+                @endforeach
+                
+                // Simple prompt for demo
+                let tagList = 'Select a tag by number:\n';
+                tagOptions.forEach((tag, index) => {
+                    tagList += `${index + 1}. ${tag.name}\n`;
+                });
+                
+                const selection = prompt(tagList);
+                if (selection !== null && selection.trim() !== '') {
+                    const tagIndex = parseInt(selection.trim()) - 1;
+                    if (!isNaN(tagIndex) && tagIndex >= 0 && tagIndex < tagOptions.length) {
+                        submitBulkAction('add_tag', { tag_id: tagOptions[tagIndex].id });
+                    } else {
+                        alert('Please select a valid tag.');
+                    }
+                }
+            });
+            
+            document.getElementById('bulkRemoveTag').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // For demo, use simple prompt with tag list
+                // In production, use a modal dialog with checkboxes
+                const tagOptions = [];
+                @foreach($tags as $tag)
+                    tagOptions.push({ id: {{ $tag->id }}, name: '{{ $tag->name }}' });
+                @endforeach
+                
+                let tagList = 'Select a tag to remove by number:\n';
+                tagOptions.forEach((tag, index) => {
+                    tagList += `${index + 1}. ${tag.name}\n`;
+                });
+                
+                const selection = prompt(tagList);
+                if (selection !== null && selection.trim() !== '') {
+                    const tagIndex = parseInt(selection.trim()) - 1;
+                    if (!isNaN(tagIndex) && tagIndex >= 0 && tagIndex < tagOptions.length) {
+                        submitBulkAction('remove_tag', { tag_id: tagOptions[tagIndex].id });
+                    } else {
+                        alert('Please select a valid tag.');
+                    }
+                }
+            });
+            
+            document.getElementById('bulkDelete').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Are you sure you want to delete all selected websites? This action cannot be undone.')) {
+                    submitBulkAction('delete');
+                }
             });
         });
     </script>
     @endsection
-</x-layouts.app> 
+</x-app-layout> 

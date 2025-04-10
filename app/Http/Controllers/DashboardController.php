@@ -6,6 +6,8 @@ use App\Models\MonitoringLog;
 use App\Models\Website;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -23,30 +25,31 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $userId = $user->id;
         
         // Get website statistics
-        $totalWebsites = Website::where('user_id', $user->id)->count();
-        $activeWebsites = Website::where('user_id', $user->id)->where('is_active', true)->count();
+        $totalWebsites = Website::where('user_id', $userId)->count();
+        $activeWebsites = Website::where('user_id', $userId)->where('is_active', true)->count();
         
         // Get websites by status
-        $upWebsites = Website::where('user_id', $user->id)
+        $upWebsites = Website::where('user_id', $userId)
             ->where('is_active', true)
-            ->where('last_status', MonitoringLog::STATUS_UP)
+            ->where('last_status', 'up')
             ->count();
             
-        $downWebsites = Website::where('user_id', $user->id)
+        $downWebsites = Website::where('user_id', $userId)
             ->where('is_active', true)
-            ->where('last_status', MonitoringLog::STATUS_DOWN)
+            ->where('last_status', 'down')
             ->count();
             
-        $changedWebsites = Website::where('user_id', $user->id)
+        $changedWebsites = Website::where('user_id', $userId)
             ->where('is_active', true)
-            ->where('last_status', MonitoringLog::STATUS_CHANGED)
+            ->where('last_status', 'changed')
             ->count();
         
         // Get recent activity
-        $recentLogs = MonitoringLog::whereHas('website', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
+        $recentLogs = MonitoringLog::whereHas('website', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
         })
         ->with('website')
         ->orderBy('created_at', 'desc')
@@ -54,16 +57,43 @@ class DashboardController extends Controller
         ->get();
         
         // Get websites with issues
-        $websitesWithIssues = Website::where('user_id', $user->id)
+        $websitesWithIssues = Website::where('user_id', $userId)
             ->where('is_active', true)
             ->where(function ($query) {
-                $query->where('last_status', MonitoringLog::STATUS_DOWN)
-                    ->orWhere('last_status', MonitoringLog::STATUS_CHANGED);
+                $query->where('last_status', 'down')
+                    ->orWhere('last_status', 'changed');
             })
             ->with('recentLogs')
             ->orderBy('last_checked_at', 'desc')
             ->take(5)
             ->get();
+        
+        // --- Start: Average Response Time Data --- 
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        $avgResponseTimes = MonitoringLog::select(
+                DB::raw('DATE(created_at) as date'), 
+                DB::raw('AVG(response_time) as average_response_time')
+            )
+            ->whereHas('website', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'asc')
+            ->get()
+            ->keyBy('date');
+
+        // Prepare data for the chart (last 7 days)
+        $responseChartLabels = [];
+        $responseChartData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->toDateString();
+            $responseChartLabels[] = Carbon::parse($date)->format('M d');
+            $responseChartData[] = $avgResponseTimes->get($date)->average_response_time ?? 0;
+        }
+        // --- End: Average Response Time Data --- 
         
         return view('dashboard', compact(
             'totalWebsites',
@@ -72,7 +102,9 @@ class DashboardController extends Controller
             'downWebsites',
             'changedWebsites',
             'recentLogs',
-            'websitesWithIssues'
+            'websitesWithIssues',
+            'responseChartLabels',
+            'responseChartData'
         ));
     }
 }

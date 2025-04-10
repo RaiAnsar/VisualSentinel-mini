@@ -22,9 +22,41 @@
                     <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" class="text-base font-semibold">
                         {{ __('Tags') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('settings.smtp')" :active="request()->routeIs('settings.*')" class="text-base font-semibold">
-                        {{ __('Settings') }}
-                    </x-nav-link>
+                    
+                    <!-- Settings Dropdown -->
+                    <div class="hidden sm:flex sm:items-center">
+                        <x-dropdown align="right" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center px-3 py-2 text-base font-semibold border-transparent leading-4 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150 {{ request()->routeIs('settings.*') ? 'border-b-2 border-indigo-400 dark:border-indigo-600 text-gray-900 dark:text-gray-100' : '' }}">
+                                    <div>{{ __('Settings') }}</div>
+    
+                                    <div class="ms-1">
+                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </button>
+                            </x-slot>
+    
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('settings.smtp')">
+                                    {{ __('SMTP Settings') }}
+                                </x-dropdown-link>
+                                
+                                <x-dropdown-link :href="route('settings.notification_emails')">
+                                    {{ __('Notification Emails') }}
+                                </x-dropdown-link>
+                                
+                                <x-dropdown-link :href="route('settings.push_notifications')">
+                                    {{ __('Push Notifications') }}
+                                </x-dropdown-link>
+                                
+                                <x-dropdown-link :href="route('settings.system')">
+                                    {{ __('System Settings') }}
+                                </x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
                 </div>
             </div>
 
@@ -101,8 +133,26 @@
             <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')">
                 {{ __('Tags') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('settings.smtp')" :active="request()->routeIs('settings.*')">
+            
+            <!-- Settings Section Header -->
+            <div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">
                 {{ __('Settings') }}
+            </div>
+            
+            <x-responsive-nav-link :href="route('settings.smtp')" :active="request()->routeIs('settings.smtp')">
+                {{ __('SMTP Settings') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('settings.notification_emails')" :active="request()->routeIs('settings.notification_emails')">
+                {{ __('Notification Emails') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('settings.push_notifications')" :active="request()->routeIs('settings.push_notifications')">
+                {{ __('Push Notifications') }}
+            </x-responsive-nav-link>
+            
+            <x-responsive-nav-link :href="route('settings.system')" :active="request()->routeIs('settings.system')">
+                {{ __('System Settings') }}
             </x-responsive-nav-link>
         </div>
 
@@ -121,12 +171,12 @@
                         class="dark-mode-toggle inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     >
                         <span class="mr-2">Toggle Dark Mode</span>
-                        <!-- Sun icon (shown in dark mode) -->
-                        <svg class="light-icon w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Sun icon (shown in light mode) -->
+                        <svg class="light-icon w-4 h-4 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        <!-- Moon icon (shown in light mode) -->
-                        <svg class="dark-icon w-4 h-4 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Moon icon (shown in dark mode) -->
+                        <svg class="dark-icon w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
                     </button>

@@ -1,17 +1,23 @@
-<x-layouts.app>
-    <div class="py-8">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Add Website') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center">
-                <a href="{{ route('websites.index') }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4">
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="mb-4">
+                <a href="{{ route('websites.index') }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                    <svg class="h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
+                    Back to Websites
                 </a>
-                <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Add Website</h1>
             </div>
             
             <!-- Form -->
-            <div class="mt-6 bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <form action="{{ route('websites.store') }}" method="POST">
                     @csrf
                     <div class="px-4 py-5 sm:p-6">
@@ -104,4 +110,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app> 
+</x-app-layout> 

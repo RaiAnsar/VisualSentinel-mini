@@ -125,6 +125,39 @@
                             Edit
                         </a>
                         
+                        <div class="relative" x-data="{ exportOpen: false }">
+                            <button @click="exportOpen = !exportOpen" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                                </svg>
+                                Export Data
+                            </button>
+                            <div x-show="exportOpen" @click.away="exportOpen = false" class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-700 focus:outline-none z-10" role="menu" aria-orientation="vertical">
+                                <div class="py-1" role="none">
+                                    <a href="{{ route('websites.export', ['website' => $website->id, 'type' => 'logs', 'days' => 30]) }}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                                        <svg class="mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Last 30 Days Logs (CSV)
+                                    </a>
+                                    <a href="{{ route('websites.export', ['website' => $website->id, 'type' => 'logs', 'days' => 90]) }}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                                        <svg class="mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Last 90 Days Logs (CSV)
+                                    </a>
+                                </div>
+                                <div class="py-1" role="none">
+                                    <a href="{{ route('websites.export', ['website' => $website->id, 'type' => 'summary', 'days' => 30]) }}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" role="menuitem">
+                                        <svg class="mr-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        </svg>
+                                        Monthly Summary (CSV)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -393,7 +426,7 @@
                             Configure notifications for this specific website.
                         </p>
                     </div>
-                    <button id="saveNotificationSettings" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button id="saveNotificationSettings" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" form="notificationForm" type="submit">
                         Save Settings
                     </button>
                 </div>
@@ -414,14 +447,14 @@
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Email notification</span>
                                         <div class="switch">
-                                            <input id="downtime_email" name="notification_settings[downtime][email]" type="checkbox" value="1" {{ ($website->notification_settings['downtime']['email'] ?? false) ? 'checked' : '' }} />
+                                            <input id="downtime_email" name="notification_settings[downtime][email]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['downtime']['email']) && $website->notification_settings['downtime']['email']) ? 'checked' : '' }} />
                                             <label for="downtime_email"></label>
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Push notification</span>
                                         <div class="switch">
-                                            <input id="downtime_push" name="notification_settings[downtime][push]" type="checkbox" value="1" {{ ($website->notification_settings['downtime']['push'] ?? false) ? 'checked' : '' }} />
+                                            <input id="downtime_push" name="notification_settings[downtime][push]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['downtime']['push']) && $website->notification_settings['downtime']['push']) ? 'checked' : '' }} />
                                             <label for="downtime_push"></label>
                                         </div>
                                     </div>
@@ -440,14 +473,14 @@
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Email notification</span>
                                         <div class="switch">
-                                            <input id="content_change_email" name="notification_settings[content_change][email]" type="checkbox" value="1" {{ ($website->notification_settings['content_change']['email'] ?? false) ? 'checked' : '' }} />
+                                            <input id="content_change_email" name="notification_settings[content_change][email]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['content_change']['email']) && $website->notification_settings['content_change']['email']) ? 'checked' : '' }} />
                                             <label for="content_change_email"></label>
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Push notification</span>
                                         <div class="switch">
-                                            <input id="content_change_push" name="notification_settings[content_change][push]" type="checkbox" value="1" {{ ($website->notification_settings['content_change']['push'] ?? false) ? 'checked' : '' }} />
+                                            <input id="content_change_push" name="notification_settings[content_change][push]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['content_change']['push']) && $website->notification_settings['content_change']['push']) ? 'checked' : '' }} />
                                             <label for="content_change_push"></label>
                                         </div>
                                     </div>
@@ -466,14 +499,14 @@
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Email when expiring soon</span>
                                         <div class="switch">
-                                            <input id="ssl_expiring_email" name="notification_settings[ssl][expiring_email]" type="checkbox" value="1" {{ ($website->notification_settings['ssl']['expiring_email'] ?? false) ? 'checked' : '' }} />
+                                            <input id="ssl_expiring_email" name="notification_settings[ssl][expiring_email]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['ssl']['expiring_email']) && $website->notification_settings['ssl']['expiring_email']) ? 'checked' : '' }} />
                                             <label for="ssl_expiring_email"></label>
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">Email on invalid certificate</span>
                                         <div class="switch">
-                                            <input id="ssl_invalid_email" name="notification_settings[ssl][invalid_email]" type="checkbox" value="1" {{ ($website->notification_settings['ssl']['invalid_email'] ?? false) ? 'checked' : '' }} />
+                                            <input id="ssl_invalid_email" name="notification_settings[ssl][invalid_email]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['ssl']['invalid_email']) && $website->notification_settings['ssl']['invalid_email']) ? 'checked' : '' }} />
                                             <label for="ssl_invalid_email"></label>
                                         </div>
                                     </div>
@@ -492,13 +525,13 @@
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-gray-900 dark:text-white mr-3">High response time alerts</span>
                                         <div class="switch">
-                                            <input id="performance_email" name="notification_settings[performance][email]" type="checkbox" value="1" {{ ($website->notification_settings['performance']['email'] ?? false) ? 'checked' : '' }} />
+                                            <input id="performance_email" name="notification_settings[performance][email]" type="checkbox" value="1" {{ (is_array($website->notification_settings) && isset($website->notification_settings['performance']['email']) && $website->notification_settings['performance']['email']) ? 'checked' : '' }} />
                                             <label for="performance_email"></label>
                                         </div>
                                     </div>
                                     <div class="flex items-center mt-4">
                                         <label for="responseTimeThreshold" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">Threshold:</label>
-                                        <input type="number" name="notification_settings[performance][threshold]" id="responseTimeThreshold" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md w-24" placeholder="1000" value="{{ $website->notification_settings['performance']['threshold'] ?? 1000 }}">
+                                        <input type="number" name="notification_settings[performance][threshold]" id="responseTimeThreshold" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block sm:text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-800 rounded-md w-24" placeholder="1000" value="{{ is_array($website->notification_settings) && isset($website->notification_settings['performance']['threshold']) ? (is_array($website->notification_settings['performance']['threshold']) ? $website->notification_settings['performance']['threshold'][0] : $website->notification_settings['performance']['threshold']) : 1000 }}">
                                         <span class="ml-1 text-sm text-gray-700 dark:text-gray-300">ms</span>
                                     </div>
                                 </div>
@@ -514,8 +547,8 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
                         <svg class="mr-2 h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
                         Advanced Settings
                     </h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
@@ -550,7 +583,7 @@
                         </div>
                         
                         <div class="flex justify-end">
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Save Settings
                             </button>
                         </div>
@@ -575,7 +608,7 @@
                     <div>
                         <form action="{{ route('websites.reset-baseline', $website->id) }}" method="POST">
                             @csrf
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 {{ isset($baselineScreenshot) ? 'Reset Baseline' : 'Set Baseline' }}
                             </button>
                         </form>
@@ -1403,6 +1436,34 @@
                 }
             });
         });
+
+        // Handle Save Notification Settings button
+        const saveNotificationSettingsBtn = document.getElementById('saveNotificationSettings');
+        if (saveNotificationSettingsBtn) {
+            saveNotificationSettingsBtn.addEventListener('click', function() {
+                // Show loading state
+                saveNotificationSettingsBtn.disabled = true;
+                const originalText = saveNotificationSettingsBtn.textContent;
+                saveNotificationSettingsBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                `;
+                
+                try {
+                    // Submit the notification form
+                    document.getElementById('notificationForm').submit();
+                } catch (error) {
+                    // Reset button state and show error
+                    saveNotificationSettingsBtn.disabled = false;
+                    saveNotificationSettingsBtn.textContent = originalText;
+                    showNotification('Error', 'Failed to save notification settings: ' + error.message, 'error');
+                    console.error('Error:', error);
+                }
+            });
+        }
     });
 </script>
 @endpush
