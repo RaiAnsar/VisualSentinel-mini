@@ -1,5 +1,6 @@
 import './bootstrap';
 import './darkMode';
+import './passwordToggle';
 import { initPushNotifications } from './pushNotifications';
 
 import Alpine from 'alpinejs';

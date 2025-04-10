@@ -38,7 +38,7 @@
                                         type="checkbox"
                                         name="data_retention_enabled"
                                         class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                        {{ SystemSetting::getValue('data_retention_enabled', true) ? 'checked' : '' }}
+                                        {{ App\Models\SystemSetting::getValue('data_retention_enabled', true) ? 'checked' : '' }}
                                     >
                                     <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Enable automatic data cleanup') }}</span>
                                 </label>
@@ -52,7 +52,7 @@
                                     name="data_retention_logs_days"
                                     type="number"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('data_retention_logs_days', 90)"
+                                    :value="App\Models\SystemSetting::getValue('data_retention_logs_days', 90)"
                                     min="7"
                                     max="365"
                                     required
@@ -69,7 +69,7 @@
                                     name="data_retention_screenshots_days"
                                     type="number"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('data_retention_screenshots_days', 30)"
+                                    :value="App\Models\SystemSetting::getValue('data_retention_screenshots_days', 30)"
                                     min="7"
                                     max="365"
                                     required
@@ -118,7 +118,7 @@
                                         type="checkbox"
                                         name="backup_enabled"
                                         class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                        {{ SystemSetting::getValue('backup_enabled', true) ? 'checked' : '' }}
+                                        {{ App\Models\SystemSetting::getValue('backup_enabled', true) ? 'checked' : '' }}
                                     >
                                     <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Enable automatic backups') }}</span>
                                 </label>
@@ -128,9 +128,9 @@
                             <div>
                                 <x-input-label for="backup_frequency" :value="__('Backup Frequency')" />
                                 <select id="backup_frequency" name="backup_frequency" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                    <option value="daily" {{ SystemSetting::getValue('backup_frequency') === 'daily' ? 'selected' : '' }}>Daily</option>
-                                    <option value="weekly" {{ SystemSetting::getValue('backup_frequency') === 'weekly' ? 'selected' : '' }}>Weekly</option>
-                                    <option value="monthly" {{ SystemSetting::getValue('backup_frequency') === 'monthly' ? 'selected' : '' }}>Monthly</option>
+                                    <option value="daily" {{ App\Models\SystemSetting::getValue('backup_frequency') === 'daily' ? 'selected' : '' }}>Daily</option>
+                                    <option value="weekly" {{ App\Models\SystemSetting::getValue('backup_frequency') === 'weekly' ? 'selected' : '' }}>Weekly</option>
+                                    <option value="monthly" {{ App\Models\SystemSetting::getValue('backup_frequency') === 'monthly' ? 'selected' : '' }}>Monthly</option>
                                 </select>
                                 <x-input-error class="mt-2" :messages="$errors->get('backup_frequency')" />
                             </div>
@@ -143,7 +143,7 @@
                                     name="backup_retention"
                                     type="number"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('backup_retention', 7)"
+                                    :value="App\Models\SystemSetting::getValue('backup_retention', 7)"
                                     min="1"
                                     max="30"
                                     required
@@ -192,7 +192,7 @@
                                         type="checkbox"
                                         name="sms_notifications_enabled"
                                         class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                                        {{ SystemSetting::getValue('sms_notifications_enabled', false) ? 'checked' : '' }}
+                                        {{ App\Models\SystemSetting::getValue('sms_notifications_enabled', false) ? 'checked' : '' }}
                                     >
                                     <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Enable SMS notifications') }}</span>
                                 </label>
@@ -206,7 +206,7 @@
                                     name="twilio_sid"
                                     type="text"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('twilio_sid')"
+                                    :value="App\Models\SystemSetting::getValue('twilio_sid')"
                                     autocomplete="off"
                                 />
                                 <x-input-error class="mt-2" :messages="$errors->get('twilio_sid')" />
@@ -220,7 +220,7 @@
                                     name="twilio_token"
                                     type="password"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('twilio_token')"
+                                    :value="App\Models\SystemSetting::getValue('twilio_token')"
                                     autocomplete="off"
                                 />
                                 <x-input-error class="mt-2" :messages="$errors->get('twilio_token')" />
@@ -234,7 +234,7 @@
                                     name="twilio_phone_number"
                                     type="text"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('twilio_phone_number')"
+                                    :value="App\Models\SystemSetting::getValue('twilio_phone_number')"
                                     placeholder="+15551234567"
                                 />
                                 <x-input-error class="mt-2" :messages="$errors->get('twilio_phone_number')" />
@@ -278,7 +278,7 @@
                                     name="license_key"
                                     type="text"
                                     class="mt-1 block w-full"
-                                    :value="SystemSetting::getValue('license_key')"
+                                    :value="App\Models\SystemSetting::getValue('license_key')"
                                     placeholder="VS-XXXX-XXXX-XXXX-XXXX"
                                     autocomplete="off"
                                 />
