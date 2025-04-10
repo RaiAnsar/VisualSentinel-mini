@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class Kernel extends ConsoleKernel
 {
@@ -16,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Run websites:check command every 5 minutes with force option
+        // Run websites:check command every 5 minutes to check all websites
         $schedule->command('websites:check --force')->everyFiveMinutes();
 
         // Check websites that are due for monitoring every minute
@@ -35,61 +36,11 @@ class Kernel extends ConsoleKernel
 
             foreach ($websites as $website) {
                 try {
-                    Log::info("Checking website: {$website->name} ({$website->url})");
-                    
-                    // Create a new monitoring log
-                    $log = new MonitoringLog();
-                    $log->website_id = $website->id;
-                    
-                    // TODO: Replace this with actual HTTP request in production
-                    // For now, using demo/mock data
-                    $statusCodes = [200, 200, 200, 201, 204, 301, 302, 304, 400, 401, 403, 404, 500, 503];
-                    $statusCode = $statusCodes[array_rand($statusCodes)];
-                    
-                    // Determine status based on status code
-                    if ($statusCode >= 200 && $statusCode < 400) {
-                        $status = 'up';
-                    } else {
-                        $status = 'down';
-                        // TODO: Add more specific statuses later (e.g., client_error, server_error)
-                    }
-                    
-                    // Response time between 50ms and 1500ms
-                    $responseTime = mt_rand(50, 1500);
-                    
-                    // Set log values
-                    $log->status_code = $statusCode;
-                    $log->status = $status;
-                    $log->response_time = $responseTime;
-                    $log->details = [
-                        'checked_at' => now()->toIso8601String(),
-                        'ip_used' => $website->use_ip_override ? $website->ip_override : '127.0.0.1',
-                        'headers' => [
-                            'User-Agent' => 'Visual Sentinel Monitoring/1.0',
-                            'Accept' => 'text/html,application/xhtml+xml,application/xml'
-                        ]
-                    ];
-                    
-                    // Save the log
-                    $log->save();
-                    
-                    // Update the website with the latest status
-                    $website->last_checked_at = now();
-                    $website->last_status = $status;
-                    $website->last_status_code = $statusCode;
-                    $website->last_response_time = $responseTime;
-                    $website->save();
-                    
-                    // Handle screenshot if enabled
-                    if (isset($website->monitoring_options['take_screenshots']) && $website->monitoring_options['take_screenshots']) {
-                        // Schedule a job to take the screenshot
-                        // TODO: Replace with actual screenshot job dispatch in production
-                        Log::info("Screenshot would be taken for: {$website->name}");
-                    }
-                    
-                    Log::info("Website check completed: {$website->name} - Status: {$status}");
+                    Log::info("Checking website due for monitoring: {$website->name} ({$website->url})");
+                    // Run the checkWebsites command for this specific website
+                    Artisan::call('websites:check', ['id' => $website->id]);
                 } catch (\Exception $e) {
-                    Log::error("Error checking website {$website->name}: " . $e->getMessage());
+                    Log::error("Error scheduling check for website {$website->name}: " . $e->getMessage());
                 }
             }
         })->everyMinute();

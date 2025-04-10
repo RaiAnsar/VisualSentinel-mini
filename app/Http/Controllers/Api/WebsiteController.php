@@ -170,6 +170,13 @@ class WebsiteController extends Controller
             ->limit(20)
             ->get();
         
+        // Get content change logs
+        $contentChangeLogs = $website->monitoringLogs()
+            ->where('status', 'changed')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+        
         // Get recent screenshots
         $screenshots = $website->screenshots()
             ->orderBy('created_at', 'desc')
@@ -195,10 +202,12 @@ class WebsiteController extends Controller
             'data' => [
                 'website' => $website,
                 'monitoring_logs' => $monitoringLogs,
+                'content_change_logs' => $contentChangeLogs,
                 'screenshots' => $screenshots,
                 'stats' => [
                     'uptime' => $uptime,
-                    'total_checks' => $totalChecks
+                    'total_checks' => $totalChecks,
+                    'content_changes' => $contentChangeLogs->count()
                 ]
             ]
         ]);
@@ -362,7 +371,7 @@ class WebsiteController extends Controller
     }
 
     /**
-     * Get website screenshots.
+     * Get the screenshots for a website
      */
     public function screenshots(Request $request, Website $website)
     {
@@ -374,20 +383,34 @@ class WebsiteController extends Controller
             ], 403);
         }
 
-        $limit = $request->input('limit', 20);
-        
+        $perPage = $request->input('per_page', 10);
         $screenshots = $website->screenshots()
             ->orderBy('created_at', 'desc')
-            ->paginate($limit)
-            ->through(function($screenshot) {
-                return [
-                    'id' => $screenshot->id,
-                    'created_at' => $screenshot->created_at,
-                    'is_baseline' => $screenshot->is_baseline,
-                    'url' => url('storage/' . $screenshot->path),
-                    'metadata' => $screenshot->metadata
+            ->paginate($perPage);
+        
+        // Transform the screenshots to include URLs and comparison data
+        $screenshots->getCollection()->transform(function ($screenshot) {
+            $data = [
+                'id' => $screenshot->id,
+                'created_at' => $screenshot->created_at,
+                'is_baseline' => $screenshot->is_baseline,
+                'url' => url('storage/' . $screenshot->path),
+                'metadata' => $screenshot->metadata
+            ];
+            
+            // Add comparison data if available
+            if ($screenshot->hasComparison()) {
+                $data['comparison'] = [
+                    'diff_url' => $screenshot->getDiffUrl(),
+                    'overlay_url' => $screenshot->getOverlayUrl(),
+                    'diff_percentage' => $screenshot->getDiffPercentage(),
+                    'baseline_id' => $screenshot->metadata['comparison']['baseline_id'] ?? null,
+                    'compared_at' => $screenshot->metadata['comparison']['compared_at'] ?? null
                 ];
-            });
+            }
+            
+            return $data;
+        });
 
         return response()->json([
             'status' => 'success',

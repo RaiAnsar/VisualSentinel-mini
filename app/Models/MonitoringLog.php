@@ -23,6 +23,7 @@ class MonitoringLog extends Model
         'error_message',
         'is_cdn_error',
         'details',
+        'content_hash',
     ];
 
     /**

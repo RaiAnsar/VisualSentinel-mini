@@ -103,4 +103,58 @@ class Screenshot extends Model
             return round($size / 1048576, 2) . ' MB';
         }
     }
+
+    /**
+     * Get the diff image URL if available
+     */
+    public function getDiffUrl()
+    {
+        if (isset($this->metadata['comparison']['diff_path'])) {
+            return url('storage/' . $this->metadata['comparison']['diff_path']);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get the overlay image URL if available
+     */
+    public function getOverlayUrl()
+    {
+        if (isset($this->metadata['comparison']['overlay_path'])) {
+            return url('storage/' . $this->metadata['comparison']['overlay_path']);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get the diff percentage if available
+     */
+    public function getDiffPercentage()
+    {
+        if (isset($this->metadata['comparison']['diff_percentage'])) {
+            return $this->metadata['comparison']['diff_percentage'];
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Check if this screenshot has comparison data
+     */
+    public function hasComparison()
+    {
+        return isset($this->metadata['comparison']);
+    }
+    
+    /**
+     * Get the baseline screenshot for this screenshot's website
+     */
+    public function getBaseline()
+    {
+        return $this->where('website_id', $this->website_id)
+            ->where('is_baseline', true)
+            ->first();
+    }
 } 

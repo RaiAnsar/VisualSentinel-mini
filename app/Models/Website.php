@@ -26,6 +26,7 @@ class Website extends Model
         'last_status',
         'last_status_code',
         'last_response_time',
+        'content_hash',
         'last_checked_at',
         'last_baseline_at',
         'baseline_screenshot_id',
